@@ -58,6 +58,23 @@ const playDamruSound = () => {
   });
 };
 
+// Interactive Diya Component
+const Diya = ({ className, lit, delay = "0s" }: { className?: string, lit: boolean, delay?: string }) => (
+  <div className={`${className} transition-all duration-1000 ${lit ? 'opacity-100 drop-shadow-[0_0_15px_rgba(255,165,0,0.5)]' : 'opacity-60 grayscale-[0.5]'}`}>
+    <div className="w-12 h-6 bg-gradient-to-b from-amber-700 to-amber-900 rounded-b-full relative shadow-lg border-t border-amber-600/50">
+       {lit && (
+         <>
+           {/* Flame Core */}
+           <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-3 h-6 bg-gradient-to-t from-orange-600 via-orange-400 to-yellow-200 rounded-[50%_50%_50%_50%_/_60%_60%_40%_40%] blur-[0.5px] animate-flicker origin-bottom" style={{ animationDelay: delay }}></div>
+           {/* Inner Flame */}
+           <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-1.5 h-3 bg-white rounded-full animate-flicker origin-bottom opacity-80" style={{ animationDelay: delay }}></div>
+           {/* Outer Glow */}
+           <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 w-16 h-16 bg-orange-500/20 rounded-full blur-xl animate-pulse"></div>
+         </>
+       )}
+    </div>
+  </div>
+);
 
 // Interactive Trishul SVG Component
 const Trishul = ({ onClick, isAnimating }: { onClick: () => void, isAnimating: boolean }) => (
@@ -382,58 +399,84 @@ function App() {
     return (
       <div className="min-h-screen bg-black pt-20 relative overflow-hidden flex flex-col items-center justify-center">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-900 via-black to-black opacity-80"></div>
+        
+        {/* Floating Particles/Lights in background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {[...Array(20)].map((_, i) => (
+                <div 
+                    key={i}
+                    className="absolute bg-saffron/30 rounded-full blur-sm animate-float"
+                    style={{
+                        width: Math.random() * 4 + 2 + 'px',
+                        height: Math.random() * 4 + 2 + 'px',
+                        top: Math.random() * 100 + '%',
+                        left: Math.random() * 100 + '%',
+                        animationDelay: Math.random() * 5 + 's',
+                        animationDuration: Math.random() * 10 + 10 + 's'
+                    }}
+                ></div>
+            ))}
+        </div>
 
         <h2 className="text-3xl font-serif text-saffron mb-8 z-10 relative drop-shadow-md">{t.virtualTemple.title}</h2>
 
-        {/* The Sanctum */}
-        <div className="relative w-80 h-96 z-10">
-          {/* Lingam */}
-          <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 w-40 h-60">
-            <div className="w-full h-full bg-gradient-to-b from-gray-800 to-black rounded-t-full border border-white/5 shadow-2xl relative overflow-hidden">
-              {/* Tripundra */}
-              <div className="absolute top-12 left-1/2 transform -translate-x-1/2 w-20 space-y-3 opacity-90">
-                <div className="h-1.5 bg-ash rounded-full shadow-[0_0_8px_white]"></div>
-                <div className="h-1.5 bg-ash rounded-full shadow-[0_0_8px_white]"></div>
-                <div className="h-1.5 bg-ash rounded-full shadow-[0_0_8px_white]"></div>
-                <div className="w-3 h-3 bg-red-600 rounded-full mx-auto mt-2 shadow-[0_0_8px_red]"></div>
-              </div>
-              {/* Belpatra Overlay if offered */}
-              {offeredBelpatra && (
-                <div className="absolute top-32 left-1/2 transform -translate-x-1/2 text-green-500 text-4xl animate-float">
-                  🍃
-                </div>
-              )}
-            </div>
-            {/* Base/Yoni */}
-            <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 w-64 h-16 bg-gradient-to-r from-gray-700 via-gray-900 to-gray-700 rounded-full border border-white/5"></div>
+        {/* The Sanctum Area */}
+        <div className="relative w-full max-w-lg h-[500px] z-10 flex flex-col items-center justify-center">
+          
+          {/* Main Aura behind Lingam */}
+          <div className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-orange-500/0 via-orange-500/10 to-orange-500/0 rounded-full blur-3xl transition-all duration-1000 ${diyaLit ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}></div>
+
+          {/* Bell */}
+          <div 
+             onClick={handleBell}
+             className={`absolute top-0 right-10 z-30 cursor-pointer origin-top transition-transform duration-300 ${bellRung ? 'rotate-12' : ''}`}
+          >
+             <div className="h-20 w-[2px] bg-gold/50 mx-auto"></div>
+             <Bell className="w-16 h-16 text-gold drop-shadow-[0_0_15px_rgba(255,215,0,0.5)] -mt-1" fill="#FFD700" />
           </div>
 
-          {/* Diya Lamps */}
-          <div className={`absolute bottom-0 left-0 transition-opacity duration-1000 ${diyaLit ? 'opacity-100' : 'opacity-30'}`}>
-            <div className="w-12 h-6 bg-yellow-700 rounded-b-full relative">
-              {diyaLit && <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-4 h-6 bg-orange-500 rounded-full blur-sm animate-flicker"></div>}
-              {diyaLit && <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-2 h-4 bg-yellow-200 rounded-full animate-flicker"></div>}
-            </div>
+          {/* Lingam Assembly */}
+          <div className="relative mt-20 z-20">
+             {/* Lingam Stone */}
+             <div className="relative w-40 h-60 mx-auto z-20">
+               <div className="w-full h-full bg-gradient-to-b from-gray-700 via-gray-900 to-black rounded-t-full border-t border-l border-r border-white/10 shadow-2xl relative overflow-hidden">
+                 {/* Tripundra */}
+                 <div className="absolute top-12 left-1/2 transform -translate-x-1/2 w-20 space-y-3 opacity-90">
+                    <div className="h-1.5 bg-ash rounded-full shadow-[0_0_8px_white]"></div>
+                    <div className="h-1.5 bg-ash rounded-full shadow-[0_0_8px_white]"></div>
+                    <div className="h-1.5 bg-ash rounded-full shadow-[0_0_8px_white]"></div>
+                    <div className="w-3 h-3 bg-red-600 rounded-full mx-auto mt-2 shadow-[0_0_8px_red]"></div>
+                 </div>
+                 {/* Belpatra */}
+                 {offeredBelpatra && (
+                   <div className="absolute top-32 left-1/2 transform -translate-x-1/2 text-green-500 text-5xl animate-float drop-shadow-lg">
+                     🍃
+                   </div>
+                 )}
+               </div>
+             </div>
+             
+             {/* Yoni Base */}
+             <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 w-72 h-24 bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 rounded-[100%] border border-white/10 shadow-2xl z-10 flex items-center justify-center">
+                 {/* Flowers around base (optional visual) */}
+                 {offeredBelpatra && <div className="absolute text-xl text-yellow-500 -top-2 left-10 animate-pulse">🌼</div>}
+                 {offeredBelpatra && <div className="absolute text-xl text-yellow-500 -top-2 right-10 animate-pulse delay-700">🌼</div>}
+             </div>
+             
+             {/* Diyas Arc */}
+             <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-96 h-20 z-30 pointer-events-none flex justify-between items-end px-2">
+                 <Diya lit={diyaLit} className="mb-8" delay="0.1s" />
+                 <Diya lit={diyaLit} className="mb-2" delay="0.3s" />
+                 <Diya lit={diyaLit} className="-mb-4 scale-125" delay="0s" />
+                 <Diya lit={diyaLit} className="mb-2" delay="0.2s" />
+                 <Diya lit={diyaLit} className="mb-8" delay="0.4s" />
+             </div>
           </div>
-          <div className={`absolute bottom-0 right-0 transition-opacity duration-1000 ${diyaLit ? 'opacity-100' : 'opacity-30'}`}>
-            <div className="w-12 h-6 bg-yellow-700 rounded-b-full relative">
-              {diyaLit && <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-4 h-6 bg-orange-500 rounded-full blur-sm animate-flicker"></div>}
-              {diyaLit && <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-2 h-4 bg-yellow-200 rounded-full animate-flicker"></div>}
-            </div>
-          </div>
-        </div>
-
-        {/* Bell */}
-        <div
-          onClick={handleBell}
-          className={`absolute top-24 right-10 z-20 cursor-pointer origin-top transition-transform duration-300 ${bellRung ? 'rotate-12' : ''}`}
-        >
-          <Bell className="w-16 h-16 text-gold drop-shadow-[0_0_15px_rgba(255,215,0,0.5)]" fill="#FFD700" />
         </div>
 
         {/* Controls */}
-        <div className="z-10 mt-12 grid grid-cols-2 gap-4 w-full max-w-md px-4">
-          <button
+        <div className="z-10 mt-16 grid grid-cols-2 gap-4 w-full max-w-md px-4">
+          <button 
             onClick={() => { setOfferedBelpatra(true); playDamruSound(); }}
             disabled={offeredBelpatra}
             className="glass hover:bg-white/10 p-4 rounded-xl flex flex-col items-center gap-2 transition-all disabled:opacity-50 border-white/20 hover:border-saffron/50"
@@ -441,9 +484,9 @@ function App() {
             <span className="text-2xl">🍃</span>
             <span className="text-sm font-medium">{t.virtualTemple.offerBelpatra}</span>
           </button>
-          <button
-            onClick={handleDiya}
-            className="glass hover:bg-white/10 p-4 rounded-xl flex flex-col items-center gap-2 transition-all border-white/20 hover:border-saffron/50"
+          <button 
+             onClick={handleDiya}
+             className="glass hover:bg-white/10 p-4 rounded-xl flex flex-col items-center gap-2 transition-all border-white/20 hover:border-saffron/50"
           >
             <Flame className={`w-6 h-6 ${diyaLit ? 'text-orange-500' : 'text-gray-400'}`} />
             <span className="text-sm font-medium">{t.virtualTemple.lightDiya}</span>
